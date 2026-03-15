@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>БИРЖА | HACKER SIMULATOR</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <canvas id="matrix-bg"></canvas>
+    <canvas id="candles-chart"></canvas>
+    
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="user-info">
+                <span class="username" id="username">Загрузка...</span>
+                <span class="mask" id="mask">🎭 #1</span>
+            </div>
+            <div class="balances">
+                <div class="balance-item">
+                    <span class="balance-label">💰 CODE</span>
+                    <span class="balance-value" id="code-balance">0</span>
+                </div>
+                <div class="balance-item">
+                    <span class="balance-label">💎 HACK</span>
+                    <span class="balance-value" id="hack-balance">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Exchange Content -->
+        <div class="content-header">
+            <h1 class="page-title">📈 КРИПТОБИРЖА</h1>
+        </div>
+        
+        <!-- Current Rate -->
+        <div class="rate-card">
+            <div class="rate-label">ТЕКУЩИЙ КУРС</div>
+            <div class="rate-value">
+                <span id="exchange-rate">1 $HACK = 100 $CODE</span>
+                <span id="rate-trend">▲</span>
+            </div>
+            <div class="rate-chart-container" id="rate-chart"></div>
+        </div>
+        
+        <!-- Exchange Form -->
+        <div class="exchange-container">
+            <!-- Buy Section -->
+            <div class="exchange-section">
+                <h3>КУПИТЬ $HACK</h3>
+                <div class="input-group">
+                    <input type="number" id="buy-amount" placeholder="Сумма в $CODE" min="1" step="1">
+                    <span class="input-suffix">$CODE</span>
+                </div>
+                <div class="exchange-info">
+                    Вы получите: <span id="buy-result">0</span> $HACK
+                </div>
+                <button class="exchange-btn buy" onclick="buyHack()" id="buy-btn">
+                    КУПИТЬ
+                </button>
+            </div>
+            
+            <!-- Sell Section -->
+            <div class="exchange-section">
+                <h3>ПРОДАТЬ $HACK</h3>
+                <div class="input-group">
+                    <input type="number" id="sell-amount" placeholder="Сумма в $HACK" min="0.1" step="0.1">
+                    <span class="input-suffix">$HACK</span>
+                </div>
+                <div class="exchange-info">
+                    Вы получите: <span id="sell-result">0</span> $CODE
+                </div>
+                <button class="exchange-btn sell" onclick="sellHack()" id="sell-btn">
+                    ПРОДАТЬ
+                </button>
+            </div>
+        </div>
+        
+        <!-- Market Stats -->
+        <div class="market-stats">
+            <div class="stat-item">
+                <div class="stat-label">Объем 24ч</div>
+                <div class="stat-value">124,532 $CODE</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Изменение</div>
+                <div class="stat-value text-success">+5.2%</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Транзакций</div>
+                <div class="stat-value">1,234</div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav-menu">
+            <div class="nav-item" onclick="navigateTo('index')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Главная</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('upgrades')">
+                <span class="nav-icon">🛠️</span>
+                <span class="nav-label">Улучшения</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('exchange')" data-active="true">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">Биржа</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('p2p')">
+                <span class="nav-icon">🤝</span>
+                <span class="nav-label">P2P</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('leaderboard')">
+                <span class="nav-icon">🏆</span>
+                <span class="nav-label">Топ</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('chat')">
+                <span class="nav-icon">💬</span>
+                <span class="nav-label">Чат</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('profile')">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Профиль</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <script src="/static/js/anticheat-client.js"></script>
+    <script src="/static/js/animations.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/exchange.js"></script>
+</body>
+</html>
