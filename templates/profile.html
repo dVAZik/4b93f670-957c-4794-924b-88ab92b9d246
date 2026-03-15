@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ПРОФИЛЬ | HACKER SIMULATOR</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <canvas id="matrix-bg"></canvas>
+    
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="user-info">
+                <span class="username" id="username">Загрузка...</span>
+                <span class="mask" id="mask">🎭 #1</span>
+            </div>
+            <div class="balances">
+                <div class="balance-item">
+                    <span class="balance-label">💰 CODE</span>
+                    <span class="balance-value" id="code-balance">0</span>
+                </div>
+                <div class="balance-item">
+                    <span class="balance-label">💎 HACK</span>
+                    <span class="balance-value" id="hack-balance">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Content -->
+        <div class="content-header">
+            <h1 class="page-title">👤 ПРОФИЛЬ</h1>
+        </div>
+        
+        <div class="profile-container">
+            <!-- Avatar/Mask Section -->
+            <div class="profile-avatar">
+                <div class="mask-display" id="current-mask">
+                    <img src="/static/images/masks/mask1.png" alt="Mask" id="mask-image">
+                </div>
+                <div class="mask-selector">
+                    <h3>ВЫБЕРИ МАСКУ</h3>
+                    <div class="mask-grid" id="mask-grid">
+                        <!-- Masks will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Section -->
+            <div class="profile-stats">
+                <h3>СТАТИСТИКА</h3>
+                <div class="stat-row">
+                    <span class="stat-name">📊 Уровень:</span>
+                    <span class="stat-value" id="profile-level">1</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">🖱️ Всего кликов:</span>
+                    <span class="stat-value" id="profile-clicks">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">💰 Заработано всего:</span>
+                    <span class="stat-value" id="profile-earned">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">📅 В игре с:</span>
+                    <span class="stat-value" id="profile-joined">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">🔒 Предупреждений:</span>
+                    <span class="stat-value" id="profile-warnings">0</span>
+                </div>
+            </div>
+            
+            <!-- Referral Section -->
+            <div class="profile-referral">
+                <h3>ПРИГЛАСИ ДРУГА</h3>
+                <p>Получи маску "Рекрут" за каждого друга!</p>
+                <div class="referral-link-container">
+                    <input type="text" id="referral-link" readonly>
+                    <button onclick="copyReferralLink()">📋</button>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="profile-actions">
+                <button class="action-btn" onclick="changeUsername()">
+                    ✏️ СМЕНИТЬ НИК
+                </button>
+                <button class="action-btn danger" onclick="logout()">
+                    🚪 ВЫЙТИ
+                </button>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav-menu">
+            <div class="nav-item" onclick="navigateTo('index')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Главная</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('upgrades')">
+                <span class="nav-icon">🛠️</span>
+                <span class="nav-label">Улучшения</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('exchange')">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">Биржа</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('p2p')">
+                <span class="nav-icon">🤝</span>
+                <span class="nav-label">P2P</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('leaderboard')">
+                <span class="nav-icon">🏆</span>
+                <span class="nav-label">Топ</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('chat')">
+                <span class="nav-icon">💬</span>
+                <span class="nav-label">Чат</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('profile')" data-active="true">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Профиль</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <script src="/static/js/anticheat-client.js"></script>
+    <script src="/static/js/animations.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/profile.js"></script>
+</body>
+</html>
