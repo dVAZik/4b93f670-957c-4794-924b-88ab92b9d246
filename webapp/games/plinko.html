@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plinko</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background: #000; }
+        #game-container { width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        canvas { width: 100%; height: auto; max-width: 400px; }
+        .ui { position: absolute; top: 10px; left: 0; width: 100%; display: flex; justify-content: space-between; padding: 10px; box-sizing: border-box; color: gold; font-size: 18px; }
+        .balance { background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 20px; border: 1px solid gold; }
+    </style>
+</head>
+<body>
+    <div class="ui">
+        <div class="balance">💰 Баланс: <span id="balance">0</span></div>
+        <div class="bet">Ставка: <input type="number" id="bet" value="10" min="10" max="1000" step="10"></div>
+    </div>
+    <div id="game-container"></div>
+    
+    <script>
+        const BALANCE_SPAN = document.getElementById('balance');
+        const BET_INPUT = document.getElementById('bet');
+        let currentBalance = window.TelegramCasino?.getBalance() || 1000;
+        let gameActive = false;
+        
+        BALANCE_SPAN.textContent = currentBalance;
+        
+        const config = {
+            type: Phaser.AUTO,
+            parent: 'game-container',
+            width: 400,
+            height: 600,
+            backgroundColor: '#000',
+            physics: {
+                default: 'matter',
+                matter: {
+                    gravity: { y: 0.5 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+        
+        let ball, pegs, multipliers;
+        let game = new Phaser.Game(config);
+        
+        function preload() {
+            this.load.image('ball', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
+            this.load.image('peg', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCb4uQAAAABJRU5ErkJggg==');
+        }
+        
+        function create() {
+            // Создание штырьков
+            pegs = this.add.group();
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col <= row; col++) {
+                    let x = 100 + col * 30 - row * 15;
+                    let y = 150 + row * 30;
+                    let peg = this.matter.add.image(x, y, 'peg', null, {
+                        isStatic: true,
+                        restitution: 0.5,
+                        friction: 0
+                    });
+                    peg.setScale(0.2);
+                    peg.setCircle(10);
+                    peg.setTint(0xffaa00);
+                    pegs.add(peg);
+                }
+            }
+            
+            // Создание множителей на дне
+            multipliers = [];
+            const multiplierValues = [10, 5, 2, 1, 0.5, 1, 2, 5, 10];
+            for (let i = 0; i < 9; i++) {
+                let x = 50 + i * 40;
+                let y = 500;
+                let mult = this.add.text(x, y, `x${multiplierValues[i]}`, {
+                    fontSize: '16px',
+                    fill: multiplierValues[i] >= 2 ? '#0f0' : multiplierValues[i] <= 0.5 ? '#f00' : '#ff0'
+                });
+                mult.setOrigin(0.5);
+                multipliers.push({
+                    text: mult,
+                    value: multiplierValues[i],
+                    x: x,
+                    y: y
+                });
+            }
+            
+            // Кнопка запуска
+            let dropButton = this.add.text(200, 550, '🎮 БРОСИТЬ', {
+                fontSize: '24px',
+                fill: '#fff',
+                backgroundColor: '#4CAF50',
+                padding: { x: 20, y: 10 }
+            }).setOrigin(0.5).setInteractive();
+            
+            dropButton.on('pointerdown', () => dropBall.call(this));
+        }
+        
+        function dropBall() {
+            if (gameActive) return;
+            
+            let bet = parseInt(BET_INPUT.value);
+            if (bet > currentBalance) {
+                alert('Недостаточно средств!');
+                return;
+            }
+            
+            if (ball) ball.destroy();
+            
+            currentBalance -= bet;
+            BALANCE_SPAN.textContent = currentBalance;
+            
+            ball = this.matter.add.image(200, 50, 'ball', null, {
+                restitution: 0.5,
+                friction: 0,
+                density: 0.001
+            });
+            ball.setScale(0.15);
+            ball.setCircle(15);
+            ball.setTint(0xffaa00);
+            ball.setBounce(0.5);
+            
+            gameActive = true;
+            
+            // Проверка падения через 5 секунд
+            this.time.delayedCall(5000, () => {
+                if (ball && ball.y > 550) {
+                    checkResult.call(this, ball.x);
+                }
+            });
+        }
+        
+        function checkResult(ballX) {
+            gameActive = false;
+            
+            // Находим ближайший множитель
+            let closest = multipliers.reduce((prev, curr) => {
+                return (Math.abs(curr.x - ballX) < Math.abs(prev.x - ballX)) ? curr : prev;
+            });
+            
+            let bet = parseInt(BET_INPUT.value);
+            let win = Math.floor(bet * closest.value);
+            
+            if (win > 0) {
+                currentBalance += win;
+                this.add.text(ballX, 450, `+${win}!`, {
+                    fontSize: '24px',
+                    fill: '#0f0'
+                }).setOrigin(0.5);
+            } else {
+                this.add.text(ballX, 450, '0', {
+                    fontSize: '24px',
+                    fill: '#f00'
+                }).setOrigin(0.5);
+            }
+            
+            BALANCE_SPAN.textContent = currentBalance;
+            
+            // Обновляем баланс в Telegram
+            if (window.TelegramCasino) {
+                window.TelegramCasino.updateBalance(win - bet, 'plinko', bet);
+            }
+            
+            // Удаляем шар через 2 секунды
+            this.time.delayedCall(2000, () => {
+                if (ball) ball.destroy();
+            });
+        }
+        
+        function update() {}
+    </script>
+</body>
+</html>
